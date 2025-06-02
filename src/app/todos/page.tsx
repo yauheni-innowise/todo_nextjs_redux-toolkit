@@ -3,9 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchTodos, selectFilteredTodos, selectTodosStatus } from '@/redux/features/todoSlice';
-import { TodoItem } from '@/components/todos/todo-item';
 import { TodoForm } from '@/components/todos/todo-form';
 import { TodoFilter } from '@/components/todos/todo-filter';
+import { TodoList } from '@/components/todos/todo-list';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { StatusMessage } from '@/components/ui/status-message';
+import { Button } from '@/components/ui/button';
 import { Todo } from '@/types/todo';
 
 export default function TodosPage(): React.ReactElement {
@@ -40,40 +43,35 @@ export default function TodosPage(): React.ReactElement {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Todo List</h1>
-        <button
+        <Button
           onClick={handleAddTodo}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          variant="primary"
+          size="md"
         >
           Add Todo
-        </button>
+        </Button>
       </div>
 
       <TodoFilter />
 
-      {status === 'loading' && (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
-        </div>
-      )}
+      {status === 'loading' && <LoadingSpinner />}
 
       {status === 'succeeded' && todos.length === 0 && (
-        <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <p className="text-gray-500">No todos found. Create a new one!</p>
-        </div>
+        <StatusMessage 
+          type="info" 
+          message="No todos found. Create a new one!" 
+        />
       )}
 
       {status === 'succeeded' && todos.length > 0 && (
-        <div className="space-y-4">
-          {todos.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} onEdit={handleEditTodo} />
-          ))}
-        </div>
+        <TodoList todos={todos} onEdit={handleEditTodo} />
       )}
 
       {status === 'failed' && (
-        <div className="text-center py-8 bg-red-50 rounded-lg">
-          <p className="text-red-500">Failed to load todos. Please try again later.</p>
-        </div>
+        <StatusMessage 
+          type="error" 
+          message="Failed to load todos. Please try again later." 
+        />
       )}
 
       {isFormOpen && (
