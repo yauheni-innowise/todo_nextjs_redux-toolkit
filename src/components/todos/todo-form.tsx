@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { Todo } from '@/types/todo';
 import { useAppDispatch } from '@/redux/hooks';
 import { createTodo, updateTodo } from '@/redux/features/todoSlice';
+import { Modal } from '@/components/ui/modal';
+import { FormInput } from '@/components/ui/form-input';
+import { Button } from '@/components/ui/button';
 
 interface TodoFormProps {
   todo?: Todo;
@@ -71,69 +74,56 @@ export function TodoForm({ todo, onClose }: TodoFormProps): React.ReactElement {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-        <h2 className="text-xl font-semibold mb-4">
-          {isEditMode ? 'Edit Todo' : 'Create New Todo'}
-        </h2>
+    <Modal
+      isOpen={true}
+      onClose={() => {
+        resetForm();
+        onClose();
+      }}
+      title={isEditMode ? 'Edit Todo' : 'Create New Todo'}
+      size="md"
+    >
+      <form onSubmit={handleSubmit}>
+        <FormInput
+          id="title"
+          label="Title"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          error={errors.title}
+          required
+        />
         
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-              Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                errors.title ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.title && (
-              <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-            )}
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                errors.description ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.description && (
-              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-            )}
-          </div>
-          
-          <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={() => {
-                resetForm();
-                onClose();
-              }}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              {isEditMode ? 'Update' : 'Create'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <FormInput
+          id="description"
+          label="Description"
+          type="textarea"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          error={errors.description}
+          required
+          rows={4}
+        />
+        
+        <div className="flex justify-end space-x-3 mt-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              resetForm();
+              onClose();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+          >
+            {isEditMode ? 'Update' : 'Create'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
